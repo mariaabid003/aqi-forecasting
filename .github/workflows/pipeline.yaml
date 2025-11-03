@@ -3,7 +3,7 @@ name: Run AQI Forecasting Pipeline
 on:
   workflow_dispatch:  # Allow manual run
   schedule:
-    - cron: '0 0 * * *'  # Runs once daily at 12:00 AM UTC
+    - cron: '0 */6 * * *'
 
 jobs:
   run-pipeline:
