@@ -1,0 +1,91 @@
+# -----------------------------
+# Python & Virtual Environments
+# -----------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+*.spec
+.env
+.venv/
+venv/
+env/
+ENV/
+pip-wheel-metadata/
+*.log
+
+# -----------------------------
+# Jupyter / Notebooks
+# -----------------------------
+.ipynb_checkpoints/
+*.ipynb_convert/
+
+# -----------------------------
+# Data & Model Files
+# -----------------------------
+data/
+datasets/
+logs/
+models/
+*.joblib
+*.pkl
+*.h5
+*.keras
+*.csv
+*.xlsx
+
+# -----------------------------
+# Secrets / Credentials
+# -----------------------------
+*.env
+.env.*
+.envrc
+.DS_Store
+secrets.json
+token.json
+config.json
+
+# -----------------------------
+# Hopsworks / Feature Store
+# -----------------------------
+hopsworks_api_key.txt
+feature_store/
+metadata/
+tmp/
+cache/
+
+# -----------------------------
+# Streamlit / Frontend
+# -----------------------------
+.streamlit/
+**/.streamlit/secrets.toml
+**/.streamlit/config.toml
+*.db
+
+# -----------------------------
+# OS / IDE Files
+# -----------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# -----------------------------
+# Build / Distribution
+# -----------------------------
+build/
+dist/
+*.egg-info/
+*.tar.gz
+*.zip
+
+# -----------------------------
+# GitHub Actions & Logs
+# -----------------------------
+requirements-ci.txt
+.github/workflows/__pycache__/
+.github/workflows/*.log
