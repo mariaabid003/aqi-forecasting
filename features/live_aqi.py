@@ -4,14 +4,14 @@ import pandas as pd
 import hopsworks
 from dotenv import load_dotenv
 from datetime import datetime
+import numpy as np
 
 # -----------------------------
-# Load environment variables (works locally + in GitHub Actions)
+# Load environment variables
 # -----------------------------
 load_dotenv()
-
 HOPSWORKS_API_KEY = os.getenv("HOPSWORKS_API_KEY")
-HOPSWORKS_PROJECT = os.getenv("HOPSWORKS_PROJECT")  # default if not set
+HOPSWORKS_PROJECT = os.getenv("HOPSWORKS_PROJECT")
 
 if not HOPSWORKS_API_KEY:
     raise ValueError("❌ Missing HOPSWORKS_API_KEY. Set it in .env or GitHub Secrets!")
@@ -51,8 +51,9 @@ def aqi_pm10(c):
 def aqi_o3(c):
     ppm = c / 2000  # µg/m³ → ppm
     bps = [
-        (0.000,0.054,0,50),(0.055,0.070,51,100),(0.071,0.085,101,150),
-        (0.086,0.105,151,200),(0.106,0.200,201,300)
+        (0.000,0.054,0,50),(0.055,0.070,51,100),
+        (0.071,0.085,101,150),(0.086,0.105,151,200),
+        (0.106,0.200,201,300)
     ]
     return calculate_aqi(ppm, bps)
 
@@ -124,6 +125,9 @@ if __name__ == "__main__":
     df["aqi_o3"] = df["ozone"].apply(aqi_o3)
     df["us_aqi"] = df[["aqi_pm25","aqi_pm10","aqi_o3"]].max(axis=1)
     df["aqi_category"] = df["us_aqi"].apply(aqi_category)
+
+    # 👇 Force a unique timestamp by adding microseconds (prevents overwrite)
+    df["time"] = df["time"] + pd.to_timedelta(np.random.randint(1, 999999), unit="us")
 
     # Append to feature group
     fg.insert(df, write_options={"wait_for_job": True})
