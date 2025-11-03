@@ -11,7 +11,7 @@ from datetime import datetime
 load_dotenv()
 
 HOPSWORKS_API_KEY = os.getenv("HOPSWORKS_API_KEY")
-HOPSWORKS_PROJECT = os.getenv("HOPSWORKS_PROJECT", "aqi-forecasting")  # default if not set
+HOPSWORKS_PROJECT = os.getenv("HOPSWORKS_PROJECT")  # default if not set
 
 if not HOPSWORKS_API_KEY:
     raise ValueError("❌ Missing HOPSWORKS_API_KEY. Set it in .env or GitHub Secrets!")
