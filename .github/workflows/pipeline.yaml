@@ -1,9 +1,9 @@
 name: Run AQI Forecasting Pipeline
 
 on:
-  workflow_dispatch:        # Manual run option
+  workflow_dispatch:  # Allow manual run
   schedule:
-    - cron: '0 */6 * * *'   # Runs every 6 hours
+    - cron: '0 */6 * * *'  # Run every 6 hours
 
 jobs:
   run-pipeline:
@@ -41,7 +41,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          grep -v apache-airflow requirements.txt > requirements-ci.txt
+          grep -v apache-airflow requirements.txt > requirements-ci.txt || cp requirements.txt requirements-ci.txt
           pip install -r requirements-ci.txt
           pip install "hopsworks[python]" || pip install confluent-kafka
 
@@ -50,13 +50,11 @@ jobs:
       # -------------------------
       - name: Run Feature Backfill
         env:
-          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-          AQICN_TOKEN: ${{ secrets.AQICN_TOKEN }}
-          aqi_forecast_api_key: ${{ secrets.aqi_forecast_api_key }}
           HOPSWORKS_HOST: ${{ secrets.HOPSWORKS_HOST }}
-          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
           HOPSWORKS_PROJECT: ${{ secrets.HOPSWORKS_PROJECT }}
           HOPSWORKS_PROJECT_ID: ${{ secrets.HOPSWORKS_PROJECT_ID }}
+          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+          AQICN_TOKEN: ${{ secrets.AQICN_TOKEN }}
         run: python features/live_aqi.py
 
       # -------------------------
@@ -64,13 +62,11 @@ jobs:
       # -------------------------
       - name: Train Sklearn Model
         env:
-          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-          AQICN_TOKEN: ${{ secrets.AQICN_TOKEN }}
-          aqi_forecast_api_key: ${{ secrets.aqi_forecast_api_key }}
           HOPSWORKS_HOST: ${{ secrets.HOPSWORKS_HOST }}
-          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
           HOPSWORKS_PROJECT: ${{ secrets.HOPSWORKS_PROJECT }}
           HOPSWORKS_PROJECT_ID: ${{ secrets.HOPSWORKS_PROJECT_ID }}
+          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+          AQICN_TOKEN: ${{ secrets.AQICN_TOKEN }}
         run: python trainings/train_sklearn.py
 
       # -------------------------
@@ -78,13 +74,11 @@ jobs:
       # -------------------------
       - name: Train TensorFlow Model
         env:
-          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-          AQICN_TOKEN: ${{ secrets.AQICN_TOKEN }}
-          aqi_forecast_api_key: ${{ secrets.aqi_forecast_api_key }}
           HOPSWORKS_HOST: ${{ secrets.HOPSWORKS_HOST }}
-          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
           HOPSWORKS_PROJECT: ${{ secrets.HOPSWORKS_PROJECT }}
           HOPSWORKS_PROJECT_ID: ${{ secrets.HOPSWORKS_PROJECT_ID }}
+          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+          AQICN_TOKEN: ${{ secrets.AQICN_TOKEN }}
         run: python trainings/train_tf.py
 
       # -------------------------
@@ -92,13 +86,11 @@ jobs:
       # -------------------------
       - name: Generate Today’s AQI Prediction
         env:
-          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-          AQICN_TOKEN: ${{ secrets.AQICN_TOKEN }}
-          aqi_forecast_api_key: ${{ secrets.aqi_forecast_api_key }}
           HOPSWORKS_HOST: ${{ secrets.HOPSWORKS_HOST }}
-          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
           HOPSWORKS_PROJECT: ${{ secrets.HOPSWORKS_PROJECT }}
           HOPSWORKS_PROJECT_ID: ${{ secrets.HOPSWORKS_PROJECT_ID }}
+          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+          AQICN_TOKEN: ${{ secrets.AQICN_TOKEN }}
         run: |
           mkdir -p data
           python trainings/predict.py

@@ -2,18 +2,33 @@ import os
 import requests
 import pandas as pd
 import hopsworks
-from dotenv import load_dotenv
 from datetime import datetime
 
 # -----------------------------
-# Load environment variables
+# Load environment variables (works in local & GitHub)
 # -----------------------------
-load_dotenv()
-HOPSWORKS_API_KEY = os.getenv("HOPSWORKS_API_KEY")
-HOPSWORKS_PROJECT = os.getenv("HOPSWORKS_PROJECT")
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    pass  # Safe to ignore in GitHub Actions
 
-if not HOPSWORKS_API_KEY:
-    raise ValueError("❌ Missing HOPSWORKS_API_KEY. Set it in .env or GitHub Secrets!")
+HOPSWORKS_API_KEY = os.environ.get("HOPSWORKS_API_KEY")
+HOPSWORKS_PROJECT = os.environ.get("HOPSWORKS_PROJECT")
+HOPSWORKS_HOST = os.environ.get("HOPSWORKS_HOST")
+HOPSWORKS_PROJECT_ID = os.environ.get("HOPSWORKS_PROJECT_ID")
+AQICN_TOKEN = os.environ.get("AQICN_TOKEN")  # Optional (kept for consistency)
+
+# --- Validation ---
+missing = [k for k, v in {
+    "HOPSWORKS_API_KEY": HOPSWORKS_API_KEY,
+    "HOPSWORKS_PROJECT": HOPSWORKS_PROJECT,
+    "HOPSWORKS_HOST": HOPSWORKS_HOST,
+    "HOPSWORKS_PROJECT_ID": HOPSWORKS_PROJECT_ID,
+}.items() if not v]
+
+if missing:
+    raise ValueError(f"❌ Missing required environment variables: {', '.join(missing)}")
 
 # -----------------------------
 # Config
@@ -109,7 +124,11 @@ def fetch_latest_weather():
 # -----------------------------
 if __name__ == "__main__":
     print("🔗 Connecting to Hopsworks...")
-    project = hopsworks.login(api_key_value=HOPSWORKS_API_KEY, project=HOPSWORKS_PROJECT)
+    project = hopsworks.login(
+        api_key_value=HOPSWORKS_API_KEY,
+        project=HOPSWORKS_PROJECT,
+        host=HOPSWORKS_HOST
+    )
     fs = project.get_feature_store()
     fg = fs.get_feature_group("karachi_aqi_us", version=1)
 
@@ -122,12 +141,11 @@ if __name__ == "__main__":
     df["aqi_pm25"] = df["pm2_5"].apply(aqi_pm25)
     df["aqi_pm10"] = df["pm10"].apply(aqi_pm10)
     df["aqi_o3"] = df["ozone"].apply(aqi_o3)
-    df["us_aqi"] = df[["aqi_pm25","aqi_pm10","aqi_o3"]].max(axis=1)
+    df["us_aqi"] = df[["aqi_pm25", "aqi_pm10", "aqi_o3"]].max(axis=1)
     df["aqi_category"] = df["us_aqi"].apply(aqi_category)
 
-    # Only keep **one row**
-    df = df.tail(1)
+    df = df.tail(1)  # keep one row
 
-    # Append this single fresh row
+    print("📤 Inserting new AQI record into Hopsworks Feature Group...")
     fg.insert(df, write_options={"wait_for_job": True})
     print(f"✅ Appended 1 fresh AQI row for {df['time'].iloc[0]} to Hopsworks.")
