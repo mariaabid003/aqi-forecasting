@@ -1,137 +1,167 @@
-/* ─────────────────────────────
-🌤️ Karachi AQI Dashboard Styles
-──────────────────────────────*/
+/* ----------------------------------
+   🌿 Karachi AQI Dashboard Styles
+   Theme: Mocha Sand + Dusty Blue (Earthy Instagram Aesthetic)
+   + Today's Mint Card
+   Font: Inter
+-----------------------------------*/
 
-/* General Layout */
-body {
-  background: linear-gradient(180deg, #e0f7fa 0%, #f1f5f9 100%);
-  font-family: 'Poppins', sans-serif;
-  color: #1e293b;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root{
+  --text: #2b2b2b;
+  --dusty: #6e7c7c;
+  --sage: #8ca6a3;
+  --panel: #fdfcfb;
+  --muted-border: #e6e2dd;
+  --mint-bg: #def8e9;
+  --mint-circle: #7bbf8e;
 }
 
-/* Page container adjustments */
-.block-container {
-  padding-top: 2rem !important;
-  padding-bottom: 2rem !important;
+/* App background */
+body, .stApp {
+    background: linear-gradient(180deg, #e9e4df 0%, #f5f3ef 100%) !important;
+    font-family: 'Inter', sans-serif;
+    color: var(--text) !important;
+    padding: 18px 22px !important;
 }
 
-/* Title */
-h1 {
-  font-size: 2.2rem !important;
-  font-weight: 700 !important;
-  color: #0f172a !important;
-  text-align: center;
-  background: linear-gradient(90deg, #0ea5e9, #6366f1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 1rem;
+/* Headings */
+.title {
+    text-align: center;
+    color: var(--dusty);
+    font-size: 2.4em;
+    font-weight: 700;
+    margin-bottom: 6px;
 }
 
-/* Subheaders */
-h2, h3, h4 {
-  color: #0f172a !important;
-  font-weight: 600 !important;
+.subtitle {
+    text-align: center;
+    color: #5b5b5b;
+    margin-bottom: 26px;
+    font-size: 1.05em;
 }
 
-/* Info, success, warning boxes */
-.stAlert {
-  border-radius: 12px !important;
-  padding: 1rem !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+/* Section title */
+.section-title {
+    margin-top: 36px;
+    color: var(--dusty);
+    font-size: 1.25em;
+    border-left: 6px solid var(--sage);
+    padding-left: 10px;
+    font-weight: 600;
 }
 
-/* Metric cards */
-div[data-testid="stMetricValue"] {
-  font-size: 2rem !important;
-  font-weight: 700 !important;
-  color: #0f172a !important;
+/* Generic AQI cards (forecast) */
+.aqi-card {
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    border: 1px solid var(--muted-border);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
 
-div[data-testid="stMetricLabel"] {
-  color: #64748b !important;
-  font-weight: 500 !important;
+.aqi-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.08);
 }
 
-/* Metric container (soft glass effect) */
-.css-1r6slb0, .css-1v0mbdj {
-  background: rgba(255, 255, 255, 0.8) !important;
-  border-radius: 18px !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important;
-  padding: 1.5rem !important;
-  backdrop-filter: blur(10px);
-  transition: transform 0.3s ease-in-out;
+.aqi-card h3 { margin: 6px 0 6px 0; color: var(--dusty); }
+.aqi-value { font-size: 1.6em; font-weight:700; color: var(--dusty); }
+.aqi-cat { font-weight:600; margin-top:6px; }
+
+/* Dataframe style */
+.stDataFrame {
+    background: white !important;
+    border-radius: 10px;
+    border: 1px solid #e9e7e4 !important;
 }
 
-.css-1r6slb0:hover, .css-1v0mbdj:hover {
-  transform: scale(1.02);
+/* Markdown and inputs */
+div[data-testid="stMarkdown"] p,
+.stTextInput, .stSelectbox, .stSlider {
+    color: var(--text) !important;
 }
 
-/* Buttons */
-.stButton > button {
-  background: linear-gradient(90deg, #38bdf8, #6366f1);
-  color: white;
-  font-weight: 600;
-  border: none;
-  border-radius: 12px;
-  padding: 0.6rem 1.2rem;
-  transition: all 0.3s ease-in-out;
+/* Hide default footer */
+footer { visibility: hidden; }
+
+/* -------------------------------
+   TODAY'S AQI Mint Card (new)
+--------------------------------*/
+.today-aqi-card {
+    display:flex;
+    gap:28px;
+    align-items:center;
+    justify-content:flex-start;
+    background: linear-gradient(180deg, #ffffff 0%, #f4fff6 100%);
+    border-radius: 18px;
+    padding: 22px;
+    border: 1px solid #c8f1db;
+    box-shadow: 0 10px 30px rgba(123,191,142,0.08);
+    max-width: 980px;
+    margin-bottom: 12px;
 }
 
-.stButton > button:hover {
-  background: linear-gradient(90deg, #0ea5e9, #4f46e5);
-  transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4);
+/* left: circle */
+.aqi-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: var(--mint-circle);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: white;
+    font-size: 44px;
+    font-weight:800;
+    box-shadow: 0 8px 30px rgba(123,191,142,0.18);
+    flex-shrink:0;
 }
 
-/* DataFrames */
-[data-testid="stDataFrame"] {
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+/* right side: city + date + category */
+.today-right { display:flex; flex-direction:column; gap:8px; align-items:flex-start; }
+.city-name {
+    font-size: 38px;
+    font-weight:800;
+    color: var(--dusty);
+    letter-spacing: 0.3px;
+    margin-bottom: -6px;
+}
+.today-date {
+    font-size: 14px;
+    color: #58605d;
+}
+.today-cat {
+    font-size: 16px;
+    font-weight:700;
+    margin-top: 6px;
 }
 
-thead tr th {
-  background-color: #0ea5e9 !important;
-  color: white !important;
-  font-weight: 600 !important;
+/* pollutant row (optional) */
+.pollutant-row {
+    display:flex;
+    gap:12px;
+    margin-top: 10px;
+    margin-bottom: 6px;
 }
-
-/* Charts */
-div[data-testid="stPlotlyChart"], div[data-testid="stPyplot"] {
-  background: white !important;
-  padding: 1rem !important;
-  border-radius: 20px !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important;
-  margin-bottom: 1.5rem;
-  transition: all 0.3s ease-in-out;
+.poll-tile {
+    background: white;
+    border-radius: 12px;
+    padding: 10px 14px;
+    min-width:70px;
+    text-align:center;
+    border: 1px solid #eef6ef;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
 }
+.pt-label { font-size:12px; color:#6b6b6b; margin-bottom:4px; }
+.pt-value { font-size:18px; font-weight:700; color:var(--dusty); }
 
-div[data-testid="stPlotlyChart"]:hover, div[data-testid="stPyplot"]:hover {
-  transform: scale(1.01);
-}
-
-/* Expanders */
-.streamlit-expanderHeader {
-  font-weight: 600;
-  color: #334155;
-  font-size: 1.1rem;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #94a3b8;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-
-/* Footer text */
-footer {
-  visibility: hidden;
+/* responsive */
+@media (max-width: 900px) {
+    .today-aqi-card { flex-direction: column; align-items:center; padding:18px; }
+    .today-right { align-items:center; text-align:center; }
+    .city-name { font-size:28px; }
+    .aqi-circle { width:120px; height:120px; font-size:36px; }
 }

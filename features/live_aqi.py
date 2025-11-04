@@ -4,7 +4,6 @@ import pandas as pd
 import hopsworks
 from dotenv import load_dotenv
 from datetime import datetime
-import numpy as np
 
 # -----------------------------
 # Load environment variables
@@ -126,9 +125,9 @@ if __name__ == "__main__":
     df["us_aqi"] = df[["aqi_pm25","aqi_pm10","aqi_o3"]].max(axis=1)
     df["aqi_category"] = df["us_aqi"].apply(aqi_category)
 
-    # 👇 Force a unique timestamp by adding microseconds (prevents overwrite)
-    df["time"] = df["time"] + pd.to_timedelta(np.random.randint(1, 999999), unit="us")
+    # Only keep **one row**
+    df = df.tail(1)
 
-    # Append to feature group
+    # Append this single fresh row
     fg.insert(df, write_options={"wait_for_job": True})
-    print(f"✅ Appended latest AQI data for {df['time'].iloc[0]} to Hopsworks.")
+    print(f"✅ Appended 1 fresh AQI row for {df['time'].iloc[0]} to Hopsworks.")

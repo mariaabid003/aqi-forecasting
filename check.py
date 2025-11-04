@@ -1,17 +1,16 @@
-import requests
-import json
+import os
+import hopsworks
+from dotenv import load_dotenv
 
-latitude = 24.8607
-longitude = 67.0011
+load_dotenv()
 
-url = (
-    f"https://air-quality-api.open-meteo.com/v1/air-quality?"
-    f"latitude={latitude}&longitude={longitude}"
-    "&hourly=pm10,pm2_5,carbon_monoxide,ozone,uv_index,temperature_2m,relative_humidity_2m,wind_speed_10m"
-)
+HOPSWORKS_API_KEY = os.getenv("HOPSWORKS_API_KEY")
+HOPSWORKS_PROJECT_ID = int(os.getenv("HOPSWORKS_PROJECT_ID"))  # Use ID instead of name
 
-response = requests.get(url)
-data = response.json()
+project = hopsworks.login(api_key_value=HOPSWORKS_API_KEY, project=HOPSWORKS_PROJECT_ID)
+fs = project.get_feature_store()
+fg = fs.get_feature_group("karachi_aqi_us", version=1)
 
-import pprint
-pprint.pprint(data)
+df = fg.read()
+print("✅ Rows in FG:", len(df))
+print(df.tail())
