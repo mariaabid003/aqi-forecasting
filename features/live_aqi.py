@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import requests
 import pandas as pd
@@ -5,26 +6,27 @@ import hopsworks
 from dotenv import load_dotenv
 from datetime import datetime
 
-# -----------------------------
-# Load environment variables
-# -----------------------------
-load_dotenv()
+# ------------------------------------------------
+# ✅ Load environment variables (local + GitHub)
+# ------------------------------------------------
+load_dotenv()  # loads from .env if running locally
+
 HOPSWORKS_API_KEY = os.getenv("HOPSWORKS_API_KEY")
-HOPSWORKS_PROJECT = os.getenv("HOPSWORKS_PROJECT")
+HOPSWORKS_PROJECT = os.getenv("HOPSWORKS_PROJECT", "YourProjectName")
 
 if not HOPSWORKS_API_KEY:
-    raise ValueError("❌ Missing HOPSWORKS_API_KEY. Set it in .env or GitHub Secrets!")
+    raise ValueError("❌ Missing HOPSWORKS_API_KEY. Add it in .env or GitHub Secrets.")
 
-# -----------------------------
-# Config
-# -----------------------------
+# ------------------------------------------------
+# 🌍 Config
+# ------------------------------------------------
 LAT, LON = 24.8607, 67.0011  # Karachi
 AIR_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
 WEATHER_URL = "https://archive-api.open-meteo.com/v1/archive"
 
-# -----------------------------
-# AQI calculation functions
-# -----------------------------
+# ------------------------------------------------
+# 🧮 AQI Calculation Helpers
+# ------------------------------------------------
 def calculate_aqi(concentration, breakpoints):
     for c_low, c_high, aqi_low, aqi_high in breakpoints:
         if c_low <= concentration <= c_high:
@@ -57,8 +59,7 @@ def aqi_o3(c):
     return calculate_aqi(ppm, bps)
 
 def aqi_category(aqi):
-    if pd.isna(aqi):
-        return None
+    if pd.isna(aqi): return None
     if aqi <= 50: return "Good"
     elif aqi <= 100: return "Moderate"
     elif aqi <= 150: return "Unhealthy (SG)"
@@ -66,9 +67,9 @@ def aqi_category(aqi):
     elif aqi <= 300: return "Very Unhealthy"
     else: return "Hazardous"
 
-# -----------------------------
-# Fetch latest air quality
-# -----------------------------
+# ------------------------------------------------
+# 🌫 Fetch Latest Air Quality
+# ------------------------------------------------
 def fetch_latest_air_quality():
     now = datetime.utcnow()
     params = {
@@ -85,9 +86,9 @@ def fetch_latest_air_quality():
     df["time"] = pd.to_datetime(df["time"])
     return df.sort_values("time").tail(1)
 
-# -----------------------------
-# Fetch latest weather
-# -----------------------------
+# ------------------------------------------------
+# 🌦 Fetch Latest Weather
+# ------------------------------------------------
 def fetch_latest_weather():
     now = datetime.utcnow()
     params = {
@@ -104,9 +105,9 @@ def fetch_latest_weather():
     df["time"] = pd.to_datetime(df["time"])
     return df.sort_values("time").tail(1)
 
-# -----------------------------
-# Main
-# -----------------------------
+# ------------------------------------------------
+# 🚀 Main
+# ------------------------------------------------
 if __name__ == "__main__":
     print("🔗 Connecting to Hopsworks...")
     project = hopsworks.login(api_key_value=HOPSWORKS_API_KEY, project=HOPSWORKS_PROJECT)
@@ -125,9 +126,7 @@ if __name__ == "__main__":
     df["us_aqi"] = df[["aqi_pm25","aqi_pm10","aqi_o3"]].max(axis=1)
     df["aqi_category"] = df["us_aqi"].apply(aqi_category)
 
-    # Only keep **one row**
-    df = df.tail(1)
-
-    # Append this single fresh row
+    # Insert into Hopsworks
     fg.insert(df, write_options={"wait_for_job": True})
-    print(f"✅ Appended 1 fresh AQI row for {df['time'].iloc[0]} to Hopsworks.")
+
+    print(f"✅ Successfully uploaded live AQI data for {df['time'].iloc[0]} to Hopsworks.")
