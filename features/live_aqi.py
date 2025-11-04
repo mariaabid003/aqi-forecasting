@@ -12,7 +12,7 @@ from datetime import datetime
 load_dotenv()  # loads from .env if running locally
 
 HOPSWORKS_API_KEY = os.getenv("HOPSWORKS_API_KEY")
-HOPSWORKS_PROJECT = os.getenv("HOPSWORKS_PROJECT", "YourProjectName")
+HOPSWORKS_PROJECT = os.getenv("HOPSWORKS_PROJECT")
 
 if not HOPSWORKS_API_KEY:
     raise ValueError("❌ Missing HOPSWORKS_API_KEY. Add it in .env or GitHub Secrets.")
