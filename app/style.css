@@ -1,167 +1,223 @@
-/* ----------------------------------
-   🌿 Karachi AQI Dashboard Styles
-   Theme: Mocha Sand + Dusty Blue (Earthy Instagram Aesthetic)
-   + Today's Mint Card
+/* ---------------------------------- 
+   💨 Karachi AQI Dashboard Styles
+   Theme: Light Blue Background + Pink Accents
    Font: Inter
 -----------------------------------*/
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-:root{
-  --text: #2b2b2b;
-  --dusty: #6e7c7c;
-  --sage: #8ca6a3;
-  --panel: #fdfcfb;
-  --muted-border: #e6e2dd;
-  --mint-bg: #def8e9;
-  --mint-circle: #7bbf8e;
+:root {
+  --bg: #eaf4ff;              /* soft light blue */
+  --accent: #f7c4da;          /* pastel pink */
+  --accent-light: #ffe4f2;    /* light pink */
+  --text: #1e293b;            /* neutral dark */
+  --card-bg: #ffffff;
+  --border: #dbeafe;
 }
 
-/* App background */
-body, .stApp {
-    background: linear-gradient(180deg, #e9e4df 0%, #f5f3ef 100%) !important;
-    font-family: 'Inter', sans-serif;
-    color: var(--text) !important;
-    padding: 18px 22px !important;
+html, body, [class*="st-"] {
+  background-color: var(--bg) !important;
+  font-family: 'Inter', sans-serif !important;
+  color: var(--text) !important;
 }
 
-/* Headings */
+/* Hide Streamlit default header/footer */
+header, footer {visibility: hidden; height: 0;}
+
+/* -----------------------------
+   Typography
+------------------------------*/
 .title {
-    text-align: center;
-    color: var(--dusty);
-    font-size: 2.4em;
-    font-weight: 700;
-    margin-bottom: 6px;
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text);
+  margin-top: 0.5rem;
 }
 
 .subtitle {
-    text-align: center;
-    color: #5b5b5b;
-    margin-bottom: 26px;
-    font-size: 1.05em;
+  text-align: center;
+  font-size: 1.05rem;
+  color: #475569;
+  margin-bottom: 2rem;
 }
 
-/* Section title */
 .section-title {
-    margin-top: 36px;
-    color: var(--dusty);
-    font-size: 1.25em;
-    border-left: 6px solid var(--sage);
-    padding-left: 10px;
-    font-weight: 600;
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1.4rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  border-left: 6px solid var(--accent);
+  padding-left: 10px;
 }
 
-/* Generic AQI cards (forecast) */
-.aqi-card {
-    background: var(--panel);
-    border-radius: 14px;
-    padding: 18px;
-    text-align: center;
-    border: 1px solid var(--muted-border);
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-}
-
-.aqi-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 36px rgba(0,0,0,0.08);
-}
-
-.aqi-card h3 { margin: 6px 0 6px 0; color: var(--dusty); }
-.aqi-value { font-size: 1.6em; font-weight:700; color: var(--dusty); }
-.aqi-cat { font-weight:600; margin-top:6px; }
-
-/* Dataframe style */
-.stDataFrame {
-    background: white !important;
-    border-radius: 10px;
-    border: 1px solid #e9e7e4 !important;
-}
-
-/* Markdown and inputs */
-div[data-testid="stMarkdown"] p,
-.stTextInput, .stSelectbox, .stSlider {
-    color: var(--text) !important;
-}
-
-/* Hide default footer */
-footer { visibility: hidden; }
-
-/* -------------------------------
-   TODAY'S AQI Mint Card (new)
---------------------------------*/
+/* -----------------------------
+   Live AQI Card
+------------------------------*/
 .today-aqi-card {
-    display:flex;
-    gap:28px;
-    align-items:center;
-    justify-content:flex-start;
-    background: linear-gradient(180deg, #ffffff 0%, #f4fff6 100%);
-    border-radius: 18px;
-    padding: 22px;
-    border: 1px solid #c8f1db;
-    box-shadow: 0 10px 30px rgba(123,191,142,0.08);
-    max-width: 980px;
-    margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  margin: 1.5rem 0;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.today-aqi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
 }
 
-/* left: circle */
+.today-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .aqi-circle {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: var(--mint-circle);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color: white;
-    font-size: 44px;
-    font-weight:800;
-    box-shadow: 0 8px 30px rgba(123,191,142,0.18);
-    flex-shrink:0;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-light), #e0f0ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
 }
 
-/* right side: city + date + category */
-.today-right { display:flex; flex-direction:column; gap:8px; align-items:flex-start; }
+.today-right {
+  text-align: right;
+}
 .city-name {
-    font-size: 38px;
-    font-weight:800;
-    color: var(--dusty);
-    letter-spacing: 0.3px;
-    margin-bottom: -6px;
+  font-size: 1.4rem;
+  font-weight: 600;
 }
 .today-date {
-    font-size: 14px;
-    color: #58605d;
+  font-size: 0.95rem;
+  color: #64748b;
 }
 .today-cat {
-    font-size: 16px;
-    font-weight:700;
-    margin-top: 6px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 0.3rem;
 }
 
-/* pollutant row (optional) */
+/* -----------------------------
+   Pollutant Tiles
+------------------------------*/
 .pollutant-row {
-    display:flex;
-    gap:12px;
-    margin-top: 10px;
-    margin-bottom: 6px;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1rem;
 }
-.poll-tile {
-    background: white;
-    border-radius: 12px;
-    padding: 10px 14px;
-    min-width:70px;
-    text-align:center;
-    border: 1px solid #eef6ef;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
-}
-.pt-label { font-size:12px; color:#6b6b6b; margin-bottom:4px; }
-.pt-value { font-size:18px; font-weight:700; color:var(--dusty); }
 
-/* responsive */
-@media (max-width: 900px) {
-    .today-aqi-card { flex-direction: column; align-items:center; padding:18px; }
-    .today-right { align-items:center; text-align:center; }
-    .city-name { font-size:28px; }
-    .aqi-circle { width:120px; height:120px; font-size:36px; }
+.poll-tile {
+  flex: 1 1 120px;
+  background: linear-gradient(120deg, #e0f0ff, #ffe4f2);
+  border-radius: 16px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+.poll-tile:hover {
+  transform: translateY(-3px);
+}
+
+.pt-label {
+  font-weight: 500;
+  color: #475569;
+}
+.pt-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* -----------------------------
+   Forecast Cards
+------------------------------*/
+.aqi-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 1.2rem;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.aqi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+
+.aqi-value {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.aqi-cat {
+  font-weight: 500;
+}
+
+/* -----------------------------
+   Plotly Chart Styling
+------------------------------*/
+.js-plotly-plot .plotly, .plotly-container {
+  border-radius: 16px !important;
+  background-color: var(--card-bg) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+  padding: 0.5rem;
+}
+
+/* -----------------------------
+   Cards & Misc
+------------------------------*/
+.block-container {
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+}
+
+div[data-testid="stMetricValue"] {
+  color: var(--text);
+}
+
+.stAlert {
+  border-radius: 12px !important;
+}
+
+.stButton>button {
+  background: linear-gradient(120deg, var(--accent), #e0f0ff);
+  color: var(--text);
+  border: none;
+  border-radius: 12px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.stButton>button:hover {
+  background: linear-gradient(120deg, #fdd6e7, #dceeff);
+}
+
+/* -----------------------------
+   Responsive
+------------------------------*/
+@media (max-width: 768px) {
+  .today-aqi-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  .today-right {
+    text-align: center;
+  }
+  .pollutant-row {
+    justify-content: center;
+  }
 }
