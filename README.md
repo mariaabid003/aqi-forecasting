@@ -246,11 +246,14 @@ python -m hopsworks.login
 
 **Live Dashboard:**  
  *Pearls AQI Predictor — Streamlit App*
+ ```bash
+https://aqi-forecasting-pcx2nq6xljecddtjlrtcj3.streamlit.app/
+```
 
 **Run locally:**
-``bash
-streamlit run dashboard/dashboard.py
-
+```bash
+streamlit run app/dashboard.py
+```
 ---
 ##  **Future Enhancements**
 
