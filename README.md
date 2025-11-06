@@ -40,32 +40,55 @@ It leverages data pipelines, feature engineering, and machine learning models to
 ##  **Features**
 
 ###  **Feature Pipeline**
-- Fetches raw air quality and weather data.  
-- Computes derived features (e.g., AQI change rate, temperature-humidity index).  
-- Stores processed features in Hopsworks Feature Store for training and inference.
+The feature pipeline is responsible for fetching raw air quality and weather data from the
+Open-Meteo API. It computes derived features such as AQI change rate and
+temperature-humidity index to enrich the dataset. All processed features are stored in
+the Hopsworks Feature Store, ensuring consistency between training and real-time
+inference. This modular pipeline allows for efficient, automated handling of
+environmental data. It supports scalability and ensures that features remain
+standardized across all downstream workflows.
 
 ###  **Historical Data Backfill**
-- Generates datasets for training using minimum 300 days of data.  
-- Ensures temporal consistency and feature completeness.
+The backfill process generates comprehensive datasets for model training using a
+minimum of 700 days of historical data. It ensures temporal consistency and
+completeness of features to improve forecasting accuracy. Historical backfill enables
+the system to learn long-term trends and seasonal patterns in air quality. Data
+preprocessing includes handling missing values, outliers, and time alignment. This
+foundation is critical for creating reliable machine learning models capable of predicting
+AQI under varying conditions.
 
-###  **Training Pipeline
-- Trains ML models: **Random Forest**, **Ridge Regression**, and **TensorFlow Dense Neural Network**.  
-- Evaluates models with **RMSE**, **MAE**, and **R²** metrics.  
-- Uploads trained models to **Hopsworks Model Registry** for versioning.
+###  **Training Pipeline**
+The training pipeline handles the development and evaluation of multiple machine
+learning models, including Random Forest, Ridge Regression, and TensorFlow Dense
+Neural Networks. Models are assessed using standard regression metrics such as
+RMSE, MAE, and R². The pipeline supports automated model selection and
+hyperparameter tuning to ensure optimal performance. Once trained, models are
+uploaded to the Hopsworks Model Registry for versioning and deployment. 
 
 ###  **Prediction Pipeline**
-- Fetches the latest features and computes the AQI forecast for the **next 3 days**.  
-- Uploads predictions to a new Hopsworks Feature Group (`karachi_aqi_predictions`).
+The prediction pipeline fetches the latest computed features to generate AQI forecasts
+for the next three days. Forecasts are calculated in real-time and uploaded to a
+dedicated Hopsworks Feature Group, karachi_aqi_predictions, for downstream use.
+This ensures seamless integration with the dashboard and other visualization tools. The
+pipeline supports automated scheduling, enabling continuous monitoring without
+manual intervention. It guarantees that predictions are always based on the most recent
+environmental data.
 
 ###  **Dashboard**
-An **interactive Streamlit dashboard** visualizes:
-- 🟢 Current AQI with pollutant details  
-- 📅 3-day forecast cards  
-- 📊 Actual vs Predicted AQI chart  
-- 📈 Trend chart & correlation heatmap  
+The interactive Streamlit dashboard provides a user-friendly interface to monitor
+Karachi’s air quality. It displays the current AQI along with pollutant details, 3-day
+forecast cards, and actual vs predicted AQI charts. Trend charts and correlation
+heatmaps allow users to understand relationships between different pollutants and
+environmental factors. The dashboard is updated in real-time and visually highlights
+hazardous AQI levels using color-coded indicators. It provides actionable insights for
+both general users and city planners.
 
 ###  **Explainability**
-- Sends alerts for hazardous AQI levels (e.g., via notifications or color-coded UI).
+Explainability is a core feature of the system, enabling users to understand how
+environmental factors influence AQI predictions. SHAP-based analysis highlights the
+contribution of each pollutant and weather parameter. The system can also send alerts
+for hazardous AQI levels, either via dashboard notifications or color-coded UI cues. This
+ensures users are informed about potential health risks in real time.
 
 ---
 
