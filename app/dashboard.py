@@ -132,16 +132,18 @@ st.markdown(
 )
 
 # -------------------------------
-# Forecast Section
+# Forecast Section (Fixed)
 # -------------------------------
 try:
-    pred_fg = fs.get_feature_group("karachi_aqi_predictions", version=1)
+    log.info("🔮 Loading forecast data from karachi_aqi_forecast...")
+    pred_fg = fs.get_feature_group("karachi_aqi_forecast", version=1)
     pred_df = pred_fg.read()
     pred_df["date"] = pd.to_datetime(pred_df["date"])
     pred_df = pred_df.sort_values("date").reset_index(drop=True)
     forecast = pred_df.tail(3).to_dict(orient="records")
+    log.info(f"✅ Loaded {len(pred_df)} forecast rows.")
 except Exception as e:
-    st.error(f"⚠️ Failed to load predictions from Hopsworks: {e}")
+    st.error(f"⚠️ Failed to load forecasts from Hopsworks: {e}")
     forecast = []
 
 st.markdown("<h2 class='section-title'>📊 AQI Forecast (Next 3 Days)</h2>", unsafe_allow_html=True)
