@@ -1,4 +1,3 @@
-# trainings/train_tf.py
 import os
 import numpy as np
 import pandas as pd
@@ -15,15 +14,9 @@ from tensorflow.keras.optimizers import Adam
 from dotenv import load_dotenv
 import tempfile
 
-# ------------------------------------------------
-# ✅ Setup logging
-# ------------------------------------------------
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
-# ------------------------------------------------
-# ✅ Load environment & connect to Hopsworks
-# ------------------------------------------------
 load_dotenv()
 project = hopsworks.login(
     api_key_value=os.getenv("HOPSWORKS_API_KEY"),
@@ -31,18 +24,12 @@ project = hopsworks.login(
 )
 fs = project.get_feature_store()
 mr = project.get_model_registry()
-log.info(f"✅ Logged in to project: {project.get_url()}")
+log.info(f"Logged in to project: {project.get_url()}")
 
-# ------------------------------------------------
-# ✅ Load Feature Group
-# ------------------------------------------------
 fg = fs.get_feature_group("karachi_aqi_us", version=1)
 df = fg.read()
-log.info(f"✅ Loaded {len(df)} rows from karachi_aqi_us")
+log.info(f"Loaded {len(df)} rows from karachi_aqi_us")
 
-# ------------------------------------------------
-# ✅ Clean & select features
-# ------------------------------------------------
 df = df.dropna(subset=["us_aqi"])
 df["time"] = pd.to_datetime(df["time"])
 df = df.sort_values("time")
@@ -62,9 +49,6 @@ TARGET = "us_aqi"
 
 df = df[["time"] + FEATURES + [TARGET]]
 
-# ------------------------------------------------
-# ✅ Time-based train-test split (last 10 days = test)
-# ------------------------------------------------
 split_time = df["time"].max() - pd.Timedelta(days=10)
 train_df = df[df["time"] <= split_time]
 test_df = df[df["time"] > split_time]
@@ -74,11 +58,8 @@ y_train = train_df[TARGET].values.reshape(-1, 1)
 X_test = test_df[FEATURES].values
 y_test = test_df[TARGET].values.reshape(-1, 1)
 
-log.info(f"🧠 Train samples: {len(X_train)}, Test samples: {len(X_test)}")
+log.info(f"Train samples: {len(X_train)}, Test samples: {len(X_test)}")
 
-# ------------------------------------------------
-# ✅ Scale data
-# ------------------------------------------------
 x_scaler = StandardScaler()
 y_scaler = StandardScaler()
 
@@ -87,9 +68,6 @@ X_test_scaled = x_scaler.transform(X_test)
 y_train_scaled = y_scaler.fit_transform(y_train)
 y_test_scaled = y_scaler.transform(y_test)
 
-# ------------------------------------------------
-# ✅ Build simple Dense NN model
-# ------------------------------------------------
 model = Sequential([
     Input(shape=(len(FEATURES),)),
     Dense(64, activation="relu"),
@@ -100,11 +78,8 @@ model = Sequential([
 ])
 
 model.compile(optimizer=Adam(learning_rate=0.001), loss="mse")
-log.info("🤖 Model compiled successfully.")
+log.info("Model compiled successfully.")
 
-# ------------------------------------------------
-# ✅ Train model
-# ------------------------------------------------
 callbacks = [
     EarlyStopping(monitor="val_loss", patience=10, restore_best_weights=True),
     ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=5, min_lr=1e-5)
@@ -119,9 +94,6 @@ history = model.fit(
     verbose=1
 )
 
-# ------------------------------------------------
-# ✅ Evaluate model
-# ------------------------------------------------
 y_pred_scaled = model.predict(X_test_scaled)
 y_pred = y_scaler.inverse_transform(y_pred_scaled)
 y_true = y_scaler.inverse_transform(y_test_scaled)
@@ -130,14 +102,11 @@ rmse = np.sqrt(mean_squared_error(y_true, y_pred))
 mae = mean_absolute_error(y_true, y_pred)
 r2 = r2_score(y_true, y_pred)
 
-log.info("📈 Model Performance on Test Data:")
+log.info("Model Performance on Test Data:")
 log.info(f"RMSE: {rmse:.2f}")
 log.info(f"MAE : {mae:.2f}")
 log.info(f"R²  : {r2:.4f}")
 
-# ------------------------------------------------
-# ✅ Upload model to Hopsworks
-# ------------------------------------------------
 with tempfile.TemporaryDirectory() as tmpdir:
     model_path = os.path.join(tmpdir, "tf_dense_model.keras")
     model.save(model_path)
@@ -151,5 +120,5 @@ with tempfile.TemporaryDirectory() as tmpdir:
     )
     model_meta.save(tmpdir)
 
-log.info("🎉 Model uploaded to Hopsworks successfully!")
-log.info(f"🌐 Explore at: {project.get_url()}/p/{project.id}/models")
+log.info("Model uploaded to Hopsworks successfully!")
+log.info(f"Explore at: {project.get_url()}/p/{project.id}/models")
