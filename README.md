@@ -50,7 +50,7 @@ standardized across all downstream workflows.
 
 ###  **Historical Data Backfill**
 The backfill process generates comprehensive datasets for model training using a
-minimum of 700 days of historical data. It ensures temporal consistency and
+minimum of 30 days of hourly historical data. It ensures temporal consistency and
 completeness of features to improve forecasting accuracy. Historical backfill enables
 the system to learn long-term trends and seasonal patterns in air quality. Data
 preprocessing includes handling missing values, outliers, and time alignment. This
@@ -151,7 +151,6 @@ cd AQI_Forecast
 
 ```bash
 conda create aqi-py310
-source venv/bin/activate       # Mac/Linux
 conda activate aqi-py310         # Windows
 
 ```
