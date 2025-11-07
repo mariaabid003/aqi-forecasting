@@ -6,7 +6,7 @@ using historical air pollution and meteorological data, providing actionable ins
 **Live Dashboard:**  
  *Pearls AQI Predictor — Streamlit App*
 ```bash
-https://aqi-forecasting-pcx2nq6xljecddtjlrtcj3.streamlit.app/
+https://aqi-forecasting-rfhe9jyjmnmnhblxypddy7.streamlit.app/
 ```
 
 ---
@@ -217,7 +217,7 @@ python -m hopsworks.login
 ---
 
 ###  **Real-time Predictions**
-- predict.py uses the trained Random Forest model and recent AQI data
+- predict.py uses the trained Random Forest model and recent AQI data due to better accuracy
 - Generates a 3-day forecast based on the past 30-day trend
 - Automatically uploads predictions to the Hopsworks Feature Store for dashboard visualization
 
@@ -259,7 +259,7 @@ python -m hopsworks.login
 **Live Dashboard:**  
  *Pearls AQI Predictor — Streamlit App*
  ```bash
-https://aqi-forecasting-pcx2nq6xljecddtjlrtcj3.streamlit.app/
+https://aqi-forecasting-rfhe9jyjmnmnhblxypddy7.streamlit.app/
 ```
 
 **Run locally:**
