@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 LAT, LON = 24.8607, 67.0011
-DAYS = 30
+DAYS = 90
 
 AIR_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
 WEATHER_URL = "https://archive-api.open-meteo.com/v1/archive"

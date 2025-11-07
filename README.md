@@ -50,7 +50,7 @@ standardized across all downstream workflows.
 
 ###  **Historical Data Backfill**
 The backfill process generates comprehensive datasets for model training using a
-minimum of 30 days of hourly historical data. It ensures temporal consistency and
+minimum of 90 days of hourly historical data. It ensures temporal consistency and
 completeness of features to improve forecasting accuracy. Historical backfill enables
 the system to learn long-term trends and seasonal patterns in air quality. Data
 preprocessing includes handling missing values, outliers, and time alignment. This
@@ -143,7 +143,7 @@ aqi_forecast/
 
 ###  **1. Clone Repository***
 ```bash
-git clone https://github.com/<your-username>/AQI_Forecast.git
+git clone https://github.com/mariaabid003/aqi-forecasting
 cd AQI_Forecast
 ```
 
@@ -193,7 +193,7 @@ python -m hopsworks.login
 ###  **Model Training**
 
 ####  **Random Forest**
-- Tuned for 80% R² on unseen data  
+- Tuned for 87% R² on unseen data  
 - Features: pollutant concentrations, temperature, humidity, wind speed  
 
 ####  **Dense Neural Network**
@@ -201,11 +201,12 @@ python -m hopsworks.login
 - Uses StandardScaler for normalization  
 - Implements Early Stopping and Learning Rate Scheduler
 - Metrics: RMSE, MAE, R²
+- Tuned for 78% R² on unseen data 
 
 ---
 
 ###  **Real-time Predictions**
-- Uses latest observed AQI and 20-day trend to forecast 3 days ahead
+- Uses latest observed AQI and 30-day trend to forecast 3 days ahead
 - Predictions automatically uploaded to Hopsworks Feature Store
 
 ---

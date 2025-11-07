@@ -114,6 +114,6 @@ if __name__ == "__main__":
     df["us_aqi"] = df[["aqi_pm25","aqi_pm10","aqi_o3"]].max(axis=1)
     df["aqi_category"] = df["us_aqi"].apply(aqi_category)
 
-    fg.insert(df, write_options={"wait_for_job": True})
+    fg.insert(df, write_options={"wait_for_job": False})
 
     print(f"Successfully uploaded live AQI data for {df['time'].iloc[0]} to Hopsworks.")
