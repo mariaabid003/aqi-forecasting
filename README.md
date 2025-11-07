@@ -57,6 +57,9 @@ preprocessing includes handling missing values, outliers, and time alignment. Th
 foundation is critical for creating reliable machine learning models capable of predicting
 AQI under varying conditions.
 
+### **Data Preprocessing**
+The preprocessing script ensures data integrity before training and forecasting. It loads the feature group from Hopsworks, checks for missing values and duplicates, and fills gaps in aqi_pm10 and aqi_o3 using linear interpolation and forward filling. This process maintains consistency and reliability across all AQI and weather features used in model development.
+
 ###  **Training Pipeline**
 The training pipeline handles the development and evaluation of multiple machine
 learning models, including Random Forest, Ridge Regression, and TensorFlow Dense
@@ -109,7 +112,7 @@ ensures users are informed about potential health risks in real time.
 ## 🗂️ **Project Structure**
 
 ```bash
-aqi_forecast/
+aqi_forecaster/
 ├── .github/
 │   └── workflows/
 │       └── pipeline.yaml          # CI/CD workflow for GitHub Actions
@@ -126,7 +129,8 @@ aqi_forecast/
 ├── features/
 │   ├── backfill.py                # Historical data backfill and feature creation
 │   ├── compute_aqi.py             # AQI computation logic (US AQI scale)
-│   └── live_aqi.py                # Fetches and updates live AQI readings
+│   ├── live_aqi.py                # Fetches and updates live AQI readings
+│   └── preprocess.py              # Cleans data, handles missing values, ensures consistency
 │
 ├── trainings/
 │   ├── train_sklearn.py           # Random Forest and Ridge Regression training
@@ -135,7 +139,8 @@ aqi_forecast/
 │
 ├── eda.ipynb                      # Exploratory Data Analysis notebook
 ├── requirements.txt               # Python dependencies
-└── .env                           # Environment variables (API keys, configs)
+└── .env                           # Environment variables for API keys and config
+
 ```
 
 ---
@@ -144,7 +149,6 @@ aqi_forecast/
 ###  **1. Clone Repository***
 ```bash
 git clone https://github.com/mariaabid003/aqi-forecasting
-cd AQI_Forecast
 ```
 
 ###  **2. Create Virtual Environment**
@@ -187,6 +191,13 @@ python -m hopsworks.login
 ### 🌫️ **AQI Computation**
 - `compute_aqi.py` calculates **PM2.5**, **PM10**, **O₃ AQI**, and overall **US AQI**  
 - Categories include: *Good*, *Moderate*, *Unhealthy (SG)*, *Unhealthy*, *Very Unhealthy*, *Hazardous*
+
+---
+### **Data Preprocessing**
+- preprocess.py loads karachi_aqi_us from Hopsworks 
+- Checks for missing values and duplicates
+- Fills NaNs in aqi_pm10 and aqi_o3 using linear interpolation and forward fill
+- Ensures data consistency before model training and AQI forecasting
 
 ---
 
