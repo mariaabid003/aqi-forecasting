@@ -159,10 +159,10 @@ conda activate aqi-py310         # Windows
 
 ```
 ### 📦 **3. Install Dependencies**
-``bash
+```
 pip install --upgrade pip
 pip install -r requirements.txt
-
+```
 
 ### 📦 **4. Configure .env File**
 ```bash
