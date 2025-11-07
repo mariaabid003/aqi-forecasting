@@ -3,6 +3,12 @@
 This project predicts the Air Quality Index (AQI) in Karachi for the next 3 days using a 100% serverless machine learning stack. It features a complete end-to-end pipeline
 using historical air pollution and meteorological data, providing actionable insights for environmental awareness and health safety.
 
+**Live Dashboard:**  
+ *Pearls AQI Predictor — Streamlit App*
+```bash
+https://aqi-forecasting-pcx2nq6xljecddtjlrtcj3.streamlit.app/
+```
+
 ---
 
 ##  **Table of Contents**
