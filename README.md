@@ -69,13 +69,7 @@ hyperparameter tuning to ensure optimal performance. Once trained, models are
 uploaded to the Hopsworks Model Registry for versioning and deployment. 
 
 ###  **Prediction Pipeline**
-The prediction pipeline fetches the latest computed features to generate AQI forecasts
-for the next three days. Forecasts are calculated in real-time and uploaded to a
-dedicated Hopsworks Feature Group, karachi_aqi_predictions, for downstream use.
-This ensures seamless integration with the dashboard and other visualization tools. The
-pipeline supports automated scheduling, enabling continuous monitoring without
-manual intervention. It guarantees that predictions are always based on the most recent
-environmental data.
+The prediction pipeline uses the trained Random Forest model along with recent AQI observations to generate a three-day air quality forecast. It analyzes the past 30-day trend to project upcoming AQI values and automatically uploads the results to the Hopsworks Feature Store, where they are used for visualization in the dashboard.
 
 ###  **Dashboard**
 The interactive Streamlit dashboard provides a user-friendly interface to monitor
@@ -217,8 +211,9 @@ python -m hopsworks.login
 ---
 
 ###  **Real-time Predictions**
-- Uses latest observed AQI and 30-day trend to forecast 3 days ahead
-- Predictions automatically uploaded to Hopsworks Feature Store
+- predict.py uses the trained Random Forest model and recent AQI data
+- Generates a 3-day forecast based on the past 30-day trend
+- Automatically uploads predictions to the Hopsworks Feature Store for dashboard visualization
 
 ---
 
