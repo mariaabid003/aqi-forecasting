@@ -10,8 +10,9 @@ import logging
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
-import plotly.graph_objects as go
 import pathlib
+import shap
+import streamlit.components.v1 as components
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -34,6 +35,7 @@ local_css("style.css")
 st.markdown("<h1 class='title'>Pearls AQI Predictor</h1>", unsafe_allow_html=True)
 st.markdown("<p class='subtitle'>Empowering you to breathe safer through AI-powered air quality insights</p>", unsafe_allow_html=True)
 
+
 load_dotenv()
 API_KEY = os.getenv("HOPSWORKS_API_KEY")
 PROJECT = os.getenv("HOPSWORKS_PROJECT")
@@ -50,14 +52,12 @@ except Exception as e:
     st.error(f"⚠️ Connection failed: {e}")
     st.stop()
 
+
 try:
-    log.info("📦 Loading feature group via Feature Query (Option 1)...")
     fg = fs.get_feature_group("karachi_aqi_us", version=1)
-    query = fg.select_all()
-    df = query.read()
+    df = fg.read()
     df["time"] = pd.to_datetime(df["time"])
     df = df.sort_values("time").reset_index(drop=True)
-    log.info(f"✅ Loaded {len(df)} rows from karachi_aqi_us.")
 except Exception as e:
     st.error(f"❌ Failed to read feature group: {e}")
     st.stop()
@@ -66,30 +66,28 @@ if df.empty:
     st.warning("No AQI data available in Hopsworks.")
     st.stop()
 
+
 def aqi_category(aqi):
     if aqi <= 50: return "Good", "#22c55e"
     elif aqi <= 100: return "Moderate", "#facc15"
     elif aqi <= 150: return "Unhealthy (Sensitive)", "#fb923c"
     elif aqi <= 200: return "Unhealthy", "#ef4444"
-    else: return "Very Unhealthy", "#a855f7"
+    elif aqi <= 300: return "Very Unhealthy", "#a855f7"
+    else: return "Hazardous", "#6b21a8"
 
 def find_pollutants(row):
-    candidates = {
-        "PM2.5": ["pm2_5", "pm25", "pm_2_5", "pm2.5", "pm_25"],
-        "PM10": ["pm10", "pm_10"],
-        "SO2": ["so2", "s02"],
-        "O3": ["o3"],
-        "CO": ["co"],
-        "NO2": ["no2", "n02"]
+    mapping = {
+        "pm2_5": "PM2.5",
+        "pm10": "PM10",
+        "carbon_monoxide": "CO",
+        "nitrogen_dioxide": "NO2",
+        "sulphur_dioxide": "SO2",
+        "ozone": "O3"
     }
     found = {}
-    for label, names in candidates.items():
-        for n in names:
-            if n in row.index:
-                val = row[n]
-                if pd.notnull(val):
-                    found[label] = float(val)
-                    break
+    for col, label in mapping.items():
+        if col in row.index and pd.notnull(row[col]):
+            found[label] = float(row[col])
     return found
 
 latest = df.tail(1).iloc[0]
@@ -116,15 +114,13 @@ st.markdown(
 )
 
 try:
-    log.info("🔮 Loading forecast data from karachi_aqi_forecast...")
     pred_fg = fs.get_feature_group("karachi_aqi_forecast", version=1)
     pred_df = pred_fg.read()
     pred_df["date"] = pd.to_datetime(pred_df["date"])
     pred_df = pred_df.sort_values("date").reset_index(drop=True)
     forecast = pred_df.tail(3).to_dict(orient="records")
-    log.info(f"✅ Loaded {len(pred_df)} forecast rows.")
 except Exception as e:
-    st.error(f"⚠️ Failed to load forecasts from Hopsworks: {e}")
+    st.error(f"⚠️ Failed to load forecasts: {e}")
     forecast = []
 
 st.markdown("<h2 class='section-title'>📊 AQI Forecast (Next 3 Days)</h2>", unsafe_allow_html=True)
@@ -151,42 +147,44 @@ try:
     model = joblib.load(os.path.join(model_dir, "model.joblib"))
     log.info(f"✅ Loaded model version {latest_model.version}.")
 except Exception as e:
-    st.warning(f"⚠️ Model not loaded, skipping model-based charts: {e}")
+    st.warning(f"⚠️ Model not loaded: {e}")
     model = None
 
 st.markdown("<h2 class='section-title'>📈 AQI Trend (Last 100 Hours)</h2>", unsafe_allow_html=True)
-fig = px.line(df.tail(100), x="time", y="us_aqi", markers=True,
-              color_discrete_sequence=["#1e3a8a"],
-              title="Recent AQI Trend")
+fig = px.line(df.tail(100), x="time", y="us_aqi", markers=True, color_discrete_sequence=["#1e3a8a"], title="Recent AQI Trend")
 st.plotly_chart(fig, use_container_width=True)
 
 if model is not None:
     st.markdown("<h2 class='section-title'>🎯 Actual vs Predicted AQI</h2>", unsafe_allow_html=True)
-    try:
-        recent = df.tail(50).copy()
-        X_recent = recent.drop(columns=["time", "aqi_category", "us_aqi"], errors="ignore")
-        X_recent = X_recent.reindex(columns=model.feature_names_in_, fill_value=0)
-        recent["Predicted_AQI"] = model.predict(X_recent)
-        fig = px.line(
-            recent,
-            x="time",
-            y=["us_aqi", "Predicted_AQI"],
-            labels={"value": "AQI", "time": "Date"},
-            title="Actual vs Predicted AQI (Last 50 Records)",
-            color_discrete_sequence=["#f5a3c4", "#1e3a8a"]
-        )
-        st.plotly_chart(fig, use_container_width=True)
-    except Exception as e:
-        st.warning(f"⚠️ Could not generate Actual vs Predicted chart: {e}")
+    recent = df.tail(50).copy()
+    X_recent = recent[model.feature_names_in_].copy()
+    recent["Predicted_AQI"] = model.predict(X_recent)
+    fig = px.line(recent, x="time", y=["us_aqi", "Predicted_AQI"],
+                  labels={"value": "AQI", "time": "Date"},
+                  title="Actual vs Predicted AQI (Last 50 Records)",
+                  color_discrete_sequence=["#f5a3c4", "#1e3a8a"])
+    st.plotly_chart(fig, use_container_width=True)
+
 
 st.markdown("<h2 class='section-title'>🧪 Pollutant Contribution Over Time</h2>", unsafe_allow_html=True)
-poll_cols = ["pm2_5", "pm10", "no2", "so2", "o3", "co"]
+poll_cols = ["pm2_5", "pm10", "carbon_monoxide", "nitrogen_dioxide", "sulphur_dioxide", "ozone"]
 available = [c for c in poll_cols if c in df.columns]
 if available:
     melted = df.tail(100).melt(id_vars="time", value_vars=available, var_name="Pollutant", value_name="Value")
+    
+    mapping = {
+        "pm2_5": "PM2.5",
+        "pm10": "PM10",
+        "carbon_monoxide": "CO",
+        "nitrogen_dioxide": "NO2",
+        "sulphur_dioxide": "SO2",
+        "ozone": "O3"
+    }
+    melted["Pollutant"] = melted["Pollutant"].map(mapping)
     fig = px.line(melted, x="time", y="Value", color="Pollutant",
                   title="Pollutant Levels Over Time (Last 100 Hours)")
     st.plotly_chart(fig, use_container_width=True)
+
 
 if model is not None:
     st.markdown("<h2 class='section-title'>🌿 Feature Importance</h2>", unsafe_allow_html=True)
@@ -199,11 +197,12 @@ if model is not None:
                  color="Importance", color_continuous_scale="purples")
     st.plotly_chart(fig, use_container_width=True)
 
-if len(pollutants) > 0:
+if pollutants:
     st.markdown("<h2 class='section-title'>🧩 Pollutant Composition (Latest Reading)</h2>", unsafe_allow_html=True)
     comp_df = pd.DataFrame({"Pollutant": list(pollutants.keys()), "Value": list(pollutants.values())})
     fig = px.pie(comp_df, values="Value", names="Pollutant", title="Composition of Key Pollutants")
     st.plotly_chart(fig, use_container_width=True)
+
 
 st.markdown("<h2 class='section-title'>🔥 Correlation Heatmap (Last 30 Days)</h2>", unsafe_allow_html=True)
 try:

@@ -39,16 +39,29 @@ def forecast_with_trend(model, df, days=3, trend_days=30):
 
     # Extract the last row as base input
     last_row = df.iloc[[-1]].copy()
+
+    # Rename live-data columns to match training features
+    column_mapping = {
+        "co": "carbon_monoxide",
+        "no2": "nitrogen_dioxide",
+        "so2": "sulphur_dioxide",
+        "o3": "ozone"
+    }
+    last_row = last_row.rename(columns=column_mapping)
+
+    # Drop columns not used for training
     drop_cols = ["time", "aqi_category", "us_aqi"]
     X_input = last_row.drop(columns=drop_cols, errors="ignore")
+
+    # Align columns to model features
     X_input = X_input.reindex(columns=model.feature_names_in_, fill_value=0)
 
-    # Compute linear trend over last 30 days
+    # Compute linear trend over last 'trend_days' rows
     last_n = df.tail(trend_days)
     slope = (last_n["us_aqi"].iloc[-1] - last_n["us_aqi"].iloc[0]) / (trend_days - 1)
-    log.info(f"📈 30-day AQI slope (trend): {slope:.4f} AQI/day")
+    log.info(f"📈 {trend_days}-day AQI slope (trend): {slope:.4f} AQI/day")
 
-    # Predict next 3 days
+    # Predict next 'days'
     forecasts = []
     base_time = last_row["time"].values[0]
     for i in range(1, days + 1):
