@@ -1,5 +1,4 @@
 import hopsworks
-import hsfs
 import pandas as pd
 import os
 from dotenv import load_dotenv
@@ -20,24 +19,24 @@ fg = fs.get_feature_group("karachi_aqi_us", version=1)
 df = fg.read()
 print(f" Loaded {len(df)} rows and {len(df.columns)} columns from karachi_aqi_us.")
 
-print("\n Data Overview (Before Cleaning):")
-print(df.info())
-
-print("\n🔍 Missing values before cleaning:")
-print(df.isna().sum())
-
+# ======================
+# Cleaning
+# ======================
 cols_to_fill = ["aqi_pm10", "aqi_o3"]
 for col in cols_to_fill:
     if col in df.columns:
-        before = df[col].isna().sum()
         df[col].fillna(method="ffill", inplace=True)
-        after = df[col].isna().sum()
-        print(f" Filled NaNs in '{col}' — before: {before}, after: {after}")
 
-duplicate_count = df.duplicated().sum()
-print(f"\n🧾 Total duplicate rows: {duplicate_count}")
+df.drop_duplicates(inplace=True)
 
-print("\n Missing values after cleaning:")
+print(" Missing values after cleaning:")
 print(df.isna().sum())
 
-print("\ Preprocessing complete — dataset cleaned successfully!")
+# ======================
+# Update Feature Group
+# ======================
+print(" 🔄 Updating Hopsworks Feature Group with cleaned data...")
+fg.insert(df, write_options={"wait_for_job": True})
+print(" ✅ Feature group updated successfully!")
+
+print("\n Preprocessing complete — dataset cleaned and saved!")
