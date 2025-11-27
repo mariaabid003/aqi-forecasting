@@ -30,7 +30,7 @@ logger.info(f"Logged in to project: {project.get_url()}")
 # Load AQI dataset
 # ------------------------
 fg = fs.get_feature_group("karachi_aqi_us", version=1)
-df = fg.read()
+df = fg.read(read_options={"use_arrow_flight": False})
 logger.info(f"Loaded {len(df)} rows from Feature Group: karachi_aqi_us")
 
 # ------------------------
