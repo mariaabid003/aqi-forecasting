@@ -27,7 +27,7 @@ mr = project.get_model_registry()
 log.info(f"Logged in to project: {project.get_url()}")
 
 fg = fs.get_feature_group("karachi_aqi_us", version=1)
-df = fg.read()
+df = fg.read(read_options={"use_arrow_flight": False})
 log.info(f"Loaded {len(df)} rows from karachi_aqi_us")
 
 df = df.dropna(subset=["us_aqi"])
