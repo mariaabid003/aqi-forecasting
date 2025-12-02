@@ -81,7 +81,7 @@ def get_forecast_data():
     fs = project.get_feature_store()
     mr = project.get_model_registry()
     fg = fs.get_feature_group("karachi_aqi_us", version=1)
-    df = fg.read(read_options={"use_arrow_flight": False})
+    df = fg.read(read_options={"use_hive": True})
     df["time"] = pd.to_datetime(df["time"])
     df = df.sort_values("time")
     log.info(f"Loaded {len(df)} rows from Feature Group: karachi_aqi_us")

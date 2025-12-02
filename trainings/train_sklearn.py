@@ -14,9 +14,6 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-# ------------------------
-# Connect to Hopsworks
-# ------------------------
 project = hopsworks.login(
     api_key_value=os.getenv("HOPSWORKS_API_KEY"),
     project=os.getenv("HOPSWORKS_PROJECT")
@@ -26,16 +23,10 @@ mr = project.get_model_registry()
 
 logger.info(f"Logged in to project: {project.get_url()}")
 
-# ------------------------
-# Load AQI dataset
-# ------------------------
 fg = fs.get_feature_group("karachi_aqi_us", version=1)
-df = fg.read(read_options={"use_arrow_flight": False})
+df = fg.read(read_options={"use_hive": True})
 logger.info(f"Loaded {len(df)} rows from Feature Group: karachi_aqi_us")
 
-# ------------------------
-# Preprocess
-# ------------------------
 df = df.dropna(subset=["us_aqi"])
 df["time"] = pd.to_datetime(df["time"])
 df = df.sort_values("time")
@@ -43,7 +34,6 @@ df = df.sort_values("time")
 target_col = "us_aqi"
 drop_cols = ["time", "aqi_category"]
 
-# Keep live-data column names consistent
 feature_cols = [
     "pm2_5", "pm10",
     "carbon_monoxide", "nitrogen_dioxide", "sulphur_dioxide", "ozone",
@@ -53,9 +43,6 @@ feature_cols = [
 X = df[feature_cols].copy()
 y = df[target_col]
 
-# ------------------------
-# Train-test split (last 10 days)
-# ------------------------
 split_time = df["time"].max() - pd.Timedelta(days=10)
 X_train = df[df["time"] <= split_time][feature_cols]
 y_train = df[df["time"] <= split_time][target_col]
@@ -64,9 +51,6 @@ y_test = df[df["time"] > split_time][target_col]
 
 logger.info(f"Training samples: {len(X_train)} | Testing samples: {len(X_test)}")
 
-# ------------------------
-# Train model
-# ------------------------
 model = RandomForestRegressor(
     n_estimators=120,
     max_depth=6,
@@ -80,12 +64,8 @@ model = RandomForestRegressor(
 logger.info("Training RandomForestRegressor...")
 model.fit(X_train, y_train)
 
-# Save feature names aligned with live data
 model.feature_names_in_ = X_train.columns.tolist()
 
-# ------------------------
-# Evaluate
-# ------------------------
 y_pred = model.predict(X_test)
 rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 mae = mean_absolute_error(y_test, y_pred)
@@ -96,9 +76,6 @@ logger.info(f"   RMSE: {rmse:.2f}")
 logger.info(f"   MAE : {mae:.2f}")
 logger.info(f"   R²  : {r2:.2f}")
 
-# ------------------------
-# Save model
-# ------------------------
 MODEL_DIR = "models/rf_aqi_model"
 os.makedirs(MODEL_DIR, exist_ok=True)
 
@@ -106,9 +83,6 @@ MODEL_PATH = os.path.join(MODEL_DIR, "model.joblib")
 joblib.dump(model, MODEL_PATH)
 logger.info(f"Model saved to {MODEL_PATH}")
 
-# ------------------------
-# Upload to Hopsworks
-# ------------------------
 model_meta = mr.python.create_model(
     name="rf_aqi_model",
     metrics={"rmse": rmse, "mae": mae, "r2": r2},

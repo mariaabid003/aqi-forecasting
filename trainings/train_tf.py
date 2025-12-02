@@ -27,7 +27,7 @@ mr = project.get_model_registry()
 log.info(f"Logged in to project: {project.get_url()}")
 
 fg = fs.get_feature_group("karachi_aqi_us", version=1)
-df = fg.read(read_options={"use_arrow_flight": False})
+df = fg.read(read_options={"use_hive": True})
 log.info(f"Loaded {len(df)} rows from karachi_aqi_us")
 
 df = df.dropna(subset=["us_aqi"])
@@ -43,7 +43,7 @@ FEATURES = [
     "carbon_monoxide",
     "temperature_2m",
     "relative_humidity_2m",
-    "wind_speed_10m",
+    "wind_speed_10m"
 ]
 TARGET = "us_aqi"
 
