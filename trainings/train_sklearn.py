@@ -24,7 +24,10 @@ mr = project.get_model_registry()
 logger.info(f"Logged in to project: {project.get_url()}")
 
 fg = fs.get_feature_group("karachi_aqi_us", version=1)
-df = fg.read(read_options={"use_hive": True})
+df = fg.read(read_options={
+    "use_hive": True,
+    "use_arrow_flight": False
+})
 logger.info(f"Loaded {len(df)} rows from Feature Group: karachi_aqi_us")
 
 df = df.dropna(subset=["us_aqi"])
@@ -68,7 +71,7 @@ model.feature_names_in_ = X_train.columns.tolist()
 
 y_pred = model.predict(X_test)
 rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-mae = mean_absolute_error(y_test, y_pred)
+mae = mean_absolute_error(y_test, y_pred))
 r2 = r2_score(y_test, y_pred)
 
 logger.info("Model performance on unseen (future) data:")
